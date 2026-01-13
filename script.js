@@ -52,3 +52,46 @@ if (mediaShell) {
     }
   }
 }
+
+const carousels = document.querySelectorAll(".carousel");
+carousels.forEach((carousel) => {
+  const viewport = carousel.querySelector(".carousel-viewport");
+  const track = carousel.querySelector(".book-track");
+  const prevBtn = carousel.querySelector(".carousel-btn.prev");
+  const nextBtn = carousel.querySelector(".carousel-btn.next");
+
+  if (!viewport || !track || !prevBtn || !nextBtn) {
+    return;
+  }
+
+  const getStep = () => {
+    const card = track.querySelector(".book-card");
+    if (!card) {
+      return viewport.clientWidth;
+    }
+    const cardWidth = card.getBoundingClientRect().width;
+    const gap = parseFloat(getComputedStyle(track).gap || "0");
+    return cardWidth + gap;
+  };
+
+  const updateButtons = () => {
+    const maxScrollLeft = viewport.scrollWidth - viewport.clientWidth - 1;
+    prevBtn.disabled = viewport.scrollLeft <= 0;
+    nextBtn.disabled = viewport.scrollLeft >= maxScrollLeft;
+  };
+
+  prevBtn.addEventListener("click", () => {
+    viewport.scrollBy({ left: -getStep(), behavior: "smooth" });
+  });
+
+  nextBtn.addEventListener("click", () => {
+    viewport.scrollBy({ left: getStep(), behavior: "smooth" });
+  });
+
+  viewport.addEventListener("scroll", () => {
+    window.requestAnimationFrame(updateButtons);
+  });
+
+  window.addEventListener("resize", updateButtons);
+  updateButtons();
+});
